@@ -6,6 +6,9 @@ import com.pincock.pincock.repository.ContentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ContentService {
@@ -23,5 +26,13 @@ public class ContentService {
         }
 
         return ContentResponseDTO.fromEntity(content);
+    }
+
+    public List<ContentResponseDTO> contentGetAll(Long userId) {
+
+        List<Content> contents = contentRepository.findAllByUserId(userId);
+        return contents.stream()
+                .map(ContentResponseDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 }

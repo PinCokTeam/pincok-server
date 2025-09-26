@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class ContentController {
@@ -30,5 +32,19 @@ public class ContentController {
 
         ContentResponseDTO contentResponseDTO = contentService.contentDetail(content_id, userId);
         return ResponseEntity.ok().body(contentResponseDTO);
+    }
+
+    // 내가 쓴 게시글 전체 조회
+    @GetMapping("/contents")
+    public ResponseEntity<List<ContentResponseDTO>> getContents(HttpSession session) {
+        UserResponseDTO userResponseDTO = (UserResponseDTO) session.getAttribute("loginUser");
+        if(userResponseDTO == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        Long userId = userResponseDTO.getId();
+
+        List<ContentResponseDTO> contentResponseDTOS = contentService.contentGetAll(userId);
+        return ResponseEntity.ok().body(contentResponseDTOS);
     }
 }
