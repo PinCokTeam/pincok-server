@@ -1,0 +1,7 @@
+package com.pincock.pincock.repository;
+
+import com.pincock.pincock.entity.Content;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ContentRepository extends JpaRepository<Content, Long> {
+}

@@ -1,0 +1,34 @@
+package com.pincock.pincock.controller;
+
+import com.pincock.pincock.dto.UserCreateRequestDTO;
+import com.pincock.pincock.dto.UserLoginRequestDTO;
+import com.pincock.pincock.dto.UserLoginResponseDTO;
+import com.pincock.pincock.dto.UserResponseDTO;
+import com.pincock.pincock.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RequiredArgsConstructor
+@RequestMapping("/users")
+@RestController
+public class UserController {
+
+    private final UserService userService;
+
+    // 유저 생성 (닉네임이 유니크한지 검증)
+    @PostMapping
+    public ResponseEntity<UserResponseDTO> addUser(@RequestBody UserCreateRequestDTO userCreateRequestDTO) {
+        UserResponseDTO userResponseDTO = userService.createUser(userCreateRequestDTO);
+        return ResponseEntity.ok(userResponseDTO);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserLoginResponseDTO> useLogin(@RequestBody UserLoginRequestDTO userLoginRequestDTO) {
+        UserLoginResponseDTO userLoginResponseDTO = userService.loginUser(userLoginRequestDTO);
+        return ResponseEntity.ok(userLoginResponseDTO);
+    }
+}
