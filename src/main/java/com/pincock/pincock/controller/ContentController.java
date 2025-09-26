@@ -1,10 +1,34 @@
 package com.pincock.pincock.controller;
 
+import com.pincock.pincock.dto.content.ContentResponseDTO;
+import com.pincock.pincock.dto.user.UserResponseDTO;
+import com.pincock.pincock.entity.Content;
+import com.pincock.pincock.service.ContentService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 public class ContentController {
 
+    private final ContentService contentService;
+
+    // 내가 쓴 게시글 상세 조회
+    @GetMapping("/contents/{content_id}")
+    public ResponseEntity<ContentResponseDTO> getContent(@PathVariable Long content_id, HttpSession session) {
+        UserResponseDTO userResponseDTO = (UserResponseDTO) session.getAttribute("loginUser");
+        if(userResponseDTO == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        Long userId = userResponseDTO.getId();
+
+        ContentResponseDTO contentResponseDTO = contentService.contentDetail(content_id, userId);
+        return ResponseEntity.ok().body(contentResponseDTO);
+    }
 }
