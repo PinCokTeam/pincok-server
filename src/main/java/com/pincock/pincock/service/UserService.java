@@ -2,7 +2,6 @@ package com.pincock.pincock.service;
 
 import com.pincock.pincock.dto.UserCreateRequestDTO;
 import com.pincock.pincock.dto.UserLoginRequestDTO;
-import com.pincock.pincock.dto.UserLoginResponseDTO;
 import com.pincock.pincock.dto.UserResponseDTO;
 import com.pincock.pincock.entity.User;
 import com.pincock.pincock.repository.UserRepository;
@@ -36,7 +35,7 @@ public class UserService {
         return UserResponseDTO.fromEntity(saved);
     }
 
-    public UserLoginResponseDTO loginUser(UserLoginRequestDTO userLoginRequestDTO) {
+    public UserResponseDTO loginUser(UserLoginRequestDTO userLoginRequestDTO) {
         Long userId = userLoginRequestDTO.getId();
 
         if (!userRepository.existsByNickname(userLoginRequestDTO.getNickname())) {
@@ -46,6 +45,6 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-
+        return UserResponseDTO.fromEntity(user);
     }
 }

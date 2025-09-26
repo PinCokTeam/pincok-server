@@ -2,9 +2,9 @@ package com.pincock.pincock.controller;
 
 import com.pincock.pincock.dto.UserCreateRequestDTO;
 import com.pincock.pincock.dto.UserLoginRequestDTO;
-import com.pincock.pincock.dto.UserLoginResponseDTO;
 import com.pincock.pincock.dto.UserResponseDTO;
 import com.pincock.pincock.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,8 +27,13 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserLoginResponseDTO> useLogin(@RequestBody UserLoginRequestDTO userLoginRequestDTO) {
-        UserLoginResponseDTO userLoginResponseDTO = userService.loginUser(userLoginRequestDTO);
-        return ResponseEntity.ok(userLoginResponseDTO);
+    public ResponseEntity<UserResponseDTO> useLogin(@RequestBody UserLoginRequestDTO userLoginRequestDTO, HttpSession session) {
+        try {
+            UserResponseDTO userResponseDTO = userService.loginUser(userLoginRequestDTO);
+            session.setAttribute("loginUser", userResponseDTO);
+            return ResponseEntity.ok(userResponseDTO);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }
