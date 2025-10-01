@@ -1,5 +1,7 @@
 package com.pincock.pincock.controller;
 
+import com.pincock.pincock.dto.crew.CrewCreateResponseDTO;
+import com.pincock.pincock.dto.crew.CrewRequestDTO;
 import com.pincock.pincock.dto.crew.CrewResponseDTO;
 import com.pincock.pincock.dto.user.UserResponseDTO;
 import com.pincock.pincock.entity.Crew;
@@ -9,9 +11,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -46,5 +46,19 @@ public class CrewController {
     public ResponseEntity<CrewResponseDTO> getCrew(@PathVariable Long crew_id) {
         CrewResponseDTO crewResponseDTO = crewService.getCrew(crew_id);
         return ResponseEntity.ok(crewResponseDTO);
+    }
+
+    // 크루 생성
+    @PostMapping("/crews")
+    public ResponseEntity<CrewCreateResponseDTO> createCrew(@RequestBody CrewRequestDTO crewRequestDTO,
+                                                            HttpSession session) {
+        UserResponseDTO userResponseDTO = (UserResponseDTO) session.getAttribute("loginUser");
+        if(userResponseDTO == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Long userId = userResponseDTO.getId();
+
+        CrewCreateResponseDTO crewCreateResponseDTO = crewService.addCrew(crewRequestDTO, userId);
+        return ResponseEntity.ok(crewCreateResponseDTO);
     }
 }

@@ -9,6 +9,7 @@ import lombok.*;
 @Table(name="crew_member")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CrewMember {
 
     @EmbeddedId
@@ -27,4 +28,14 @@ public class CrewMember {
     @Enumerated(EnumType.STRING)
     @Column(name = "crew_status")
     private CrewStatus crewStatus;
+
+    public static CrewMember createLeader(User user, Crew crew) {
+        CrewMemberId id = new CrewMemberId(user.getId(), crew.getId());
+        return CrewMember.builder()
+                .id(id)
+                .user(user)
+                .crew(crew)
+                .crewStatus(CrewStatus.LEADER)
+                .build();
+    }
 }
