@@ -1,12 +1,11 @@
 package com.pincock.pincock.controller;
 
+import com.pincock.pincock.dto.image.ContentImageRequestDTO;
 import com.pincock.pincock.dto.image.ContentImageResponseDTO;
 import com.pincock.pincock.service.ContentImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,4 +22,11 @@ public class ContentImageController {
         return ResponseEntity.ok(contentImageResponseDTOs);
     }
 
+    // 게시글 이미지 생성
+    @PostMapping("/contents/{content_id}/images")
+    public ResponseEntity<List<ContentImageResponseDTO>> addContentImage(@PathVariable Long content_id,
+                                                                   @RequestBody List<ContentImageRequestDTO> contentImageRequestDTOs) {
+        List<ContentImageResponseDTO> contentImageResponseDTOs = contentImageService.addImages(content_id, contentImageRequestDTOs);
+        return ResponseEntity.ok(contentImageResponseDTOs);
+    }
 }
