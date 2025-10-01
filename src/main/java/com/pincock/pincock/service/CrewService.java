@@ -37,4 +37,9 @@ public class CrewService {
                 .map(CrewResponseDTO::fromEntity) // DTO 변환
                 .toList();
     }
+
+    public CrewResponseDTO getCrew(Long crewId) {
+        Crew crew = crewRepository.findById(crewId).orElseThrow();
+        return CrewResponseDTO.fromEntity(crew);
+    }
 }

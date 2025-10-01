@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -38,5 +39,12 @@ public class CrewController {
         List<CrewResponseDTO> crewResponseDTOS = crewService.getUserCrewList(userId);
 
         return ResponseEntity.ok(crewResponseDTOS);
+    }
+
+    // 크루 상세 조회
+    @GetMapping("/crews/{crew_id}")
+    public ResponseEntity<CrewResponseDTO> getCrew(@PathVariable Long crew_id) {
+        CrewResponseDTO crewResponseDTO = crewService.getCrew(crew_id);
+        return ResponseEntity.ok(crewResponseDTO);
     }
 }
