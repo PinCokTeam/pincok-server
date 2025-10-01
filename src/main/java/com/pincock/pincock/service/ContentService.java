@@ -75,4 +75,16 @@ public class ContentService {
         contentRepository.save(content);
         return ContentResponseDTO.fromEntity(content);
     }
+
+    @Transactional
+    public void deleteContent(Long contentId, Long userId) {
+        Content content = contentRepository.findById(contentId)
+                .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
+
+        if (!content.getUser().getId().equals(userId)) {
+            throw new RuntimeException("본인 게시글만 삭제할 수 있습니다.");
+        }
+
+        contentRepository.delete(content);
+    }
 }

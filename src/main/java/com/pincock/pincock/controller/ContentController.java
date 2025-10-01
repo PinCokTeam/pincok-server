@@ -47,6 +47,7 @@ public class ContentController {
         return ResponseEntity.ok().body(contentResponseDTOS);
     }
 
+    // 게시글 생성
     @PostMapping("/contents")
     public ResponseEntity<ContentResponseDTO> createContent(@RequestBody ContentCreateRequestDTO contentCreateRequestDTO, HttpSession session) {
         UserResponseDTO userResponseDTO = (UserResponseDTO) session.getAttribute("loginUser");
@@ -58,6 +59,7 @@ public class ContentController {
         return ResponseEntity.ok().body(contentResponseDTO);
     }
 
+    // 내가 쓴 게시글 수정
     @PutMapping("/contents/{content_id}")
     public ResponseEntity<ContentResponseDTO> changeContent(@PathVariable Long content_id,
                                                             @RequestBody ContentUpdateRequestDTO updateRequestDTO,
@@ -70,4 +72,21 @@ public class ContentController {
         ContentResponseDTO contentResponseDTO = contentService.updateContent(updateRequestDTO, content_id, userId);
         return ResponseEntity.ok().body(contentResponseDTO);
     }
+
+    // 내가 쓴 게시글 삭제
+    @DeleteMapping("/contents/{content_id}")
+    public ResponseEntity<?> deleteContent(@PathVariable Long content_id, HttpSession session) {
+        UserResponseDTO userResponseDTO = (UserResponseDTO) session.getAttribute("loginUser");
+        if (userResponseDTO == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        try {
+            contentService.deleteContent(content_id, userResponseDTO.getId());
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // or 404/403
+        }
+    }
+
 }
