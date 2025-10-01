@@ -17,6 +17,7 @@ public class Content_Image {
     @Column(name = "content_image_id")
     private Long id;
 
+    @Column(name = "image_url")
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)

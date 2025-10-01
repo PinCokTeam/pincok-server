@@ -23,7 +23,7 @@ public class Crew {
     @Column(nullable = false)
     private String detail;
 
-    @Column(name = "image_Url")
-    private String image_Url;
+    @Column(name = "image_url")
+    private String imageUrl;
 
 }
