@@ -62,4 +62,21 @@ public class CrewService {
         crewMemberRepository.save(crewMember);
         return CrewCreateResponseDTO.fromEntity(savedCrew, userId);
     }
+
+    public void joinCrew(Long crewId, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
+
+        Crew crew = crewRepository.findById(crewId)
+                .orElseThrow(() -> new RuntimeException("해당 크루가 존재하지 않습니다."));
+
+        boolean exists = crewMemberRepository.existsByUserAndCrew(user, crew);
+        if (exists) {
+            throw new RuntimeException("이미 해당 크루에 가입되어 있습니다.");
+        }
+
+        CrewMember crewMember = CrewMember.joinUser(user, crew);
+
+        crewMemberRepository.save(crewMember);
+    }
 }

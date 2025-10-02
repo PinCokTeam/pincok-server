@@ -38,4 +38,13 @@ public class CrewMember {
                 .crewStatus(CrewStatus.LEADER)
                 .build();
     }
+
+    public static CrewMember joinUser(User user, Crew crew) {
+        return CrewMember.builder()
+                .id(new CrewMemberId(user.getId(), crew.getId()))
+                .user(user)
+                .crew(crew)
+                .crewStatus(CrewStatus.USER)
+                .build();
+    }
 }

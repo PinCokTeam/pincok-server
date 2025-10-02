@@ -61,4 +61,17 @@ public class CrewController {
         CrewCreateResponseDTO crewCreateResponseDTO = crewService.addCrew(crewRequestDTO, userId);
         return ResponseEntity.ok(crewCreateResponseDTO);
     }
+
+    // 크루 입장
+    @PostMapping("/crews/{crew_id}/join")
+    public ResponseEntity<Void> joinCrew(@PathVariable Long crew_id,
+                                         HttpSession session) {
+        UserResponseDTO userResponseDTO = (UserResponseDTO) session.getAttribute("loginUser");
+        if(userResponseDTO == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Long userId = userResponseDTO.getId();
+        crewService.joinCrew(crew_id, userId);
+        return ResponseEntity.ok(null);
+    }
 }
