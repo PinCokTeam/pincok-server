@@ -1,8 +1,6 @@
 package com.pincock.pincock.service;
 
-import com.pincock.pincock.dto.crew.CrewCreateResponseDTO;
-import com.pincock.pincock.dto.crew.CrewRequestDTO;
-import com.pincock.pincock.dto.crew.CrewResponseDTO;
+import com.pincock.pincock.dto.crew.*;
 import com.pincock.pincock.entity.*;
 import com.pincock.pincock.repository.CrewMemberRepository;
 import com.pincock.pincock.repository.CrewRepository;
@@ -78,5 +76,34 @@ public class CrewService {
         CrewMember crewMember = CrewMember.joinUser(user, crew);
 
         crewMemberRepository.save(crewMember);
+    }
+
+    @Transactional
+    public CrewUpdateResponseDTO updateCrew(Long crewId, Long userId, CrewUpdateRequestDTO crewUpdateRequestDTO) {
+        Crew crew = crewRepository.findById(crewId)
+                .orElseThrow(() -> new RuntimeException("크루가 존재하지 않습니다."));
+
+        CrewMember leader = crewMemberRepository.findByCrewIdAndUserId(crewId, userId)
+                .orElseThrow(() -> new RuntimeException("해당 유저는 크루에 속해있지 않습니다."));
+
+        if (leader.getCrewStatus() != CrewStatus.LEADER) {
+            throw new RuntimeException("크루장만 수정할 수 있습니다.");
+        }
+
+        if (crewUpdateRequestDTO.getName() != null) crew.setName(crewUpdateRequestDTO.getName());
+        if (crewUpdateRequestDTO.getDetail() != null) crew.setDetail(crewUpdateRequestDTO.getDetail());
+        if (crewUpdateRequestDTO.getImageUrl() != null) crew.setImageUrl(crewUpdateRequestDTO.getImageUrl());
+
+        CrewMember currentLeader = leader;
+
+        if (crewUpdateRequestDTO.getNewLeaderId() != null) {
+            CrewMember newLeader = crewMemberRepository.findByCrewIdAndUserId(crewId, crewUpdateRequestDTO.getNewLeaderId())
+                    .orElseThrow(() -> new RuntimeException("위임 대상이 크루에 속해있지 않습니다."));
+
+            leader.setCrewStatus(CrewStatus.USER);
+            newLeader.setCrewStatus(CrewStatus.LEADER);
+            currentLeader = newLeader;
+        }
+        return CrewUpdateResponseDTO.fromEntity(crew, currentLeader);
     }
 }

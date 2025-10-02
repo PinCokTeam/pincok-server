@@ -1,8 +1,6 @@
 package com.pincock.pincock.controller;
 
-import com.pincock.pincock.dto.crew.CrewCreateResponseDTO;
-import com.pincock.pincock.dto.crew.CrewRequestDTO;
-import com.pincock.pincock.dto.crew.CrewResponseDTO;
+import com.pincock.pincock.dto.crew.*;
 import com.pincock.pincock.dto.user.UserResponseDTO;
 import com.pincock.pincock.entity.Crew;
 import com.pincock.pincock.service.CrewService;
@@ -73,5 +71,20 @@ public class CrewController {
         Long userId = userResponseDTO.getId();
         crewService.joinCrew(crew_id, userId);
         return ResponseEntity.ok(null);
+    }
+
+    // 크루 수정
+    @PutMapping("/crews/{crew_id}")
+    public ResponseEntity<CrewUpdateResponseDTO> updateCrew(@PathVariable Long crew_id,
+                                                      @RequestBody CrewUpdateRequestDTO crewUpdateRequestDTO,
+                                                      HttpSession session) {
+        UserResponseDTO userResponseDTO = (UserResponseDTO) session.getAttribute("loginUser");
+        if(userResponseDTO == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Long userId = userResponseDTO.getId();
+
+        CrewUpdateResponseDTO crewUpdateResponseDTO = crewService.updateCrew(crew_id, userId, crewUpdateRequestDTO);
+        return ResponseEntity.ok(crewUpdateResponseDTO);
     }
 }
