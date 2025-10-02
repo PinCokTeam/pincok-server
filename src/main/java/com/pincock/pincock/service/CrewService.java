@@ -124,4 +124,15 @@ public class CrewService {
 
         crewRepository.delete(crew);
     }
+
+    @Transactional
+    public void leaveCrew(Long crewId, Long userId) {
+        CrewMember User = crewMemberRepository.findByCrewIdAndUserId(crewId, userId)
+                .orElseThrow(() -> new RuntimeException("해당 유저는 크루에 속해있지 않습니다."));
+
+        if (User.getCrewStatus() != CrewStatus.USER) {
+            throw new RuntimeException("일반 유저만 탈퇴할 수 있습니다.");
+        }
+        crewMemberRepository.delete(User);
+    }
 }

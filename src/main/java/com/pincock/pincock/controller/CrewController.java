@@ -88,6 +88,7 @@ public class CrewController {
         return ResponseEntity.ok(crewUpdateResponseDTO);
     }
 
+    // 크루 삭제
     @DeleteMapping("/crews/{crew_id}")
     public ResponseEntity<Void> deleteCrew(@PathVariable Long crew_id,
                                            HttpSession session) {
@@ -98,6 +99,19 @@ public class CrewController {
         Long userId = userResponseDTO.getId();
 
         crewService.deleteCrew(crew_id, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // 크루 탈퇴
+    @DeleteMapping("/users/me/crews/{crew_id}")
+    public ResponseEntity<Void> leaveCrew(@PathVariable Long crew_id,
+                                          HttpSession session) {
+        UserResponseDTO userResponseDTO = (UserResponseDTO) session.getAttribute("loginUser");
+        if(userResponseDTO == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Long userId = userResponseDTO.getId();
+        crewService.leaveCrew(crew_id, userId);
         return ResponseEntity.noContent().build();
     }
 }
