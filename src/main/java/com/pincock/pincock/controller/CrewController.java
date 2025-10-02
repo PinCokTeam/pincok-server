@@ -1,5 +1,6 @@
 package com.pincock.pincock.controller;
 
+import com.pincock.pincock.dto.content.ContentResponseDTO;
 import com.pincock.pincock.dto.crew.*;
 import com.pincock.pincock.dto.user.UserResponseDTO;
 import com.pincock.pincock.entity.Crew;
@@ -113,5 +114,19 @@ public class CrewController {
         Long userId = userResponseDTO.getId();
         crewService.leaveCrew(crew_id, userId);
         return ResponseEntity.noContent().build();
+    }
+
+    // 속한 크루 게시글 전체 조회
+    @GetMapping("/crews/{crew_id}/contents")
+    public ResponseEntity<List<ContentResponseDTO>> getCrewContents(@PathVariable Long crew_id,
+                                                                    HttpSession session) {
+        UserResponseDTO userResponseDTO = (UserResponseDTO) session.getAttribute("loginUser");
+        if(userResponseDTO == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Long userId = userResponseDTO.getId();
+
+        List<ContentResponseDTO> contentResponseDTOS = crewService.getCrewContents(crew_id, userId);
+        return ResponseEntity.ok(contentResponseDTOS);
     }
 }

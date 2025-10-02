@@ -1,7 +1,9 @@
 package com.pincock.pincock.service;
 
+import com.pincock.pincock.dto.content.ContentResponseDTO;
 import com.pincock.pincock.dto.crew.*;
 import com.pincock.pincock.entity.*;
+import com.pincock.pincock.repository.ContentRepository;
 import com.pincock.pincock.repository.CrewMemberRepository;
 import com.pincock.pincock.repository.CrewRepository;
 import com.pincock.pincock.repository.UserRepository;
@@ -19,6 +21,7 @@ public class CrewService {
     private final CrewRepository crewRepository;
     private final UserRepository userRepository;
     private final CrewMemberRepository crewMemberRepository;
+    private final ContentRepository contentRepository;
 
     public List<CrewResponseDTO> getCrewList() {
         List<Crew> crews = crewRepository.findAll();
@@ -134,5 +137,21 @@ public class CrewService {
             throw new RuntimeException("일반 유저만 탈퇴할 수 있습니다.");
         }
         crewMemberRepository.delete(User);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ContentResponseDTO> getCrewContents(Long crewId, Long userId) {
+        crewMemberRepository.findByCrewIdAndUserId(crewId, userId)
+                .orElseThrow(() -> new RuntimeException("해당 유저는 크루에 속해있지 않습니다."));
+
+        List<Long> userIds = crewMemberRepository.findByCrewId(crewId)
+                .stream()
+                .map(cm -> cm.getUser().getId())
+                .toList();
+
+        List<Content> contents = contentRepository.findAllByUserIdIn(userIds);
+        return contents.stream()
+                .map(ContentResponseDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 }
