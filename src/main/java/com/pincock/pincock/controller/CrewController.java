@@ -129,4 +129,19 @@ public class CrewController {
         List<ContentResponseDTO> contentResponseDTOS = crewService.getCrewContents(crew_id, userId);
         return ResponseEntity.ok(contentResponseDTOS);
     }
+
+    // 속한 크루 게시글 상세 조회
+    @GetMapping("/crews/{crew_id}/contents/{content_id}")
+    public ResponseEntity<ContentResponseDTO> getCrewContents(@PathVariable Long crew_id,
+                                                              @PathVariable Long content_id,
+                                                              HttpSession session) {
+        UserResponseDTO userResponseDTO = (UserResponseDTO) session.getAttribute("loginUser");
+        if(userResponseDTO == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Long userId = userResponseDTO.getId();
+
+        ContentResponseDTO contentResponseDTO = crewService.getCrewContent(crew_id, content_id, userId);
+        return ResponseEntity.ok(contentResponseDTO);
+    }
 }

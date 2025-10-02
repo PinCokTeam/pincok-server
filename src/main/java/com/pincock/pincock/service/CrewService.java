@@ -154,4 +154,23 @@ public class CrewService {
                 .map(ContentResponseDTO::fromEntity)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public ContentResponseDTO getCrewContent(Long crewId, Long contentId, Long userId) {
+        crewMemberRepository.findByCrewIdAndUserId(crewId, userId)
+                .orElseThrow(() -> new RuntimeException("해당 유저는 크루에 속해있지 않습니다."));
+
+        Content content = contentRepository.findById(contentId)
+                .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
+
+        boolean isMember = crewMemberRepository.existsByUserAndCrew(content.getUser(),
+                crewRepository.findById(crewId)
+                        .orElseThrow(() -> new RuntimeException("크루가 존재하지 않습니다.")));
+
+        if (!isMember) {
+            throw new RuntimeException("해당 게시글은 크루 멤버가 작성한 게시글이 아닙니다.");
+        }
+
+        return ContentResponseDTO.fromEntity(content);
+    }
 }
