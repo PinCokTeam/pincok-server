@@ -106,4 +106,22 @@ public class CrewService {
         }
         return CrewUpdateResponseDTO.fromEntity(crew, currentLeader);
     }
+
+    @Transactional
+    public void deleteCrew(Long crewId, Long userId) {
+        CrewMember leader = crewMemberRepository.findByCrewIdAndUserId(crewId, userId)
+                .orElseThrow(() -> new RuntimeException("해당 유저는 크루에 속해있지 않습니다."));
+
+        if (leader.getCrewStatus() != CrewStatus.LEADER) {
+            throw new RuntimeException("크루장만 삭제할 수 있습니다.");
+        }
+
+        List<CrewMember> members = crewMemberRepository.findAllByCrewId(crewId);
+        crewMemberRepository.deleteAll(members);
+
+        Crew crew = crewRepository.findById(crewId)
+                .orElseThrow(() -> new RuntimeException("크루가 존재하지 않습니다."));
+
+        crewRepository.delete(crew);
+    }
 }

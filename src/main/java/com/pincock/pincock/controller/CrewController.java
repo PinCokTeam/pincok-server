@@ -87,4 +87,17 @@ public class CrewController {
         CrewUpdateResponseDTO crewUpdateResponseDTO = crewService.updateCrew(crew_id, userId, crewUpdateRequestDTO);
         return ResponseEntity.ok(crewUpdateResponseDTO);
     }
+
+    @DeleteMapping("/crews/{crew_id}")
+    public ResponseEntity<Void> deleteCrew(@PathVariable Long crew_id,
+                                           HttpSession session) {
+        UserResponseDTO userResponseDTO = (UserResponseDTO) session.getAttribute("loginUser");
+        if(userResponseDTO == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Long userId = userResponseDTO.getId();
+
+        crewService.deleteCrew(crew_id, userId);
+        return ResponseEntity.noContent().build();
+    }
 }
