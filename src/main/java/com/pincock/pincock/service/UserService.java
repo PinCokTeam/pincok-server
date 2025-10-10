@@ -8,6 +8,7 @@ import com.pincock.pincock.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -16,6 +17,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    @Transactional
     public UserResponseDTO createUser(UserCreateRequestDTO requestDTO) {
 
         // 1) 닉네임 중복 검증

@@ -5,6 +5,7 @@ import com.pincock.pincock.dto.UserLoginRequestDTO;
 import com.pincock.pincock.dto.UserResponseDTO;
 import com.pincock.pincock.service.UserService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class UserController {
 
     // 유저 생성 (닉네임이 유니크한지 검증)
     @PostMapping
-    public ResponseEntity<UserResponseDTO> addUser(@RequestBody UserCreateRequestDTO userCreateRequestDTO) {
+    public ResponseEntity<UserResponseDTO> addUser(@Valid @RequestBody UserCreateRequestDTO userCreateRequestDTO) {
         UserResponseDTO userResponseDTO = userService.createUser(userCreateRequestDTO);
         return ResponseEntity.ok(userResponseDTO);
     }
