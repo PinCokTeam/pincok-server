@@ -4,12 +4,10 @@ import com.pincock.pincock.dto.content.ContentResponseDTO;
 import com.pincock.pincock.entity.Content;
 import com.pincock.pincock.entity.Content_Image;
 import com.pincock.pincock.entity.ImageStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
