@@ -49,7 +49,7 @@ public class ContentService {
 
         Content content = Content.builder()
                 .title(contentCreateRequestDTO.getTitle())
-                .detail(contentCreateRequestDTO.getContent())
+                .detail(contentCreateRequestDTO.getDetail())
                 .latitude(contentCreateRequestDTO.getLatitude())
                 .longitude(contentCreateRequestDTO.getLongitude())
                 .user(user)
