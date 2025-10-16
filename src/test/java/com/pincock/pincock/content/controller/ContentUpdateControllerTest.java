@@ -1,7 +1,9 @@
-package com.pincock.pincock.content;
+package com.pincock.pincock.content.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pincock.pincock.controller.ContentController;
 import com.pincock.pincock.dto.content.ContentResponseDTO;
+import com.pincock.pincock.dto.content.ContentUpdateRequestDTO;
 import com.pincock.pincock.dto.user.UserResponseDTO;
 import com.pincock.pincock.service.ContentService;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,20 +14,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ContentController.class)
-class ContentDetailControllerTest {
+class ContentUpdateControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
     private ContentService contentService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private MockHttpSession session;
 
@@ -36,30 +43,21 @@ class ContentDetailControllerTest {
     }
 
     @Test
-    @DisplayName("게시글 상세 조회 성공")
-    void getContent_success() throws Exception {
-        ContentResponseDTO mockResponse = new ContentResponseDTO(
-                1L,
-                "제목",
-                "내용",
-                37.5665,
-                126.978
-        );
-        Mockito.when(contentService.contentDetail(anyLong(), anyLong())).thenReturn(mockResponse);
+    @DisplayName("게시글 수정 성공")
+    void updateContent_success() throws Exception {
+        ContentUpdateRequestDTO updateRequest = new ContentUpdateRequestDTO("수정된 제목", "수정된 내용");
+        ContentResponseDTO response = new ContentResponseDTO(1L, "수정된 제목", "수정된 내용", 37.5665, 126.978);
 
-        mockMvc.perform(get("/contents/1").session(session))
+        Mockito.when(contentService.updateContent(any(), anyLong(), anyLong())).thenReturn(response);
+
+        mockMvc.perform(put("/contents/1")
+                        .session(session)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.title").value("제목"))
-                .andExpect(jsonPath("$.detail").value("내용"))
+                .andExpect(jsonPath("$.title").value("수정된 제목"))
+                .andExpect(jsonPath("$.detail").value("수정된 내용"))
                 .andExpect(jsonPath("$.latitude").value(37.5665))
                 .andExpect(jsonPath("$.longitude").value(126.978));
-    }
-
-    @Test
-    @DisplayName("로그인 안 한 상태에서 게시글 상세 조회 실패")
-    void getContent_unauthorized() throws Exception {
-        mockMvc.perform(get("/contents/1"))
-                .andExpect(status().isUnauthorized());
     }
 }

@@ -7,65 +7,52 @@ import com.pincock.pincock.repository.UserRepository;
 import com.pincock.pincock.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@ActiveProfiles("test")  // application-test.yml 적용
+@Transactional          // 테스트 끝나면 롤백
 class CreateUserTest {
 
-    @Mock
-    private UserRepository userRepository;
-
-    @InjectMocks
+    @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     @DisplayName("✅ 닉네임이 중복되지 않으면 유저를 정상 생성한다")
     void createUser_Success() {
-        // given
         UserCreateRequestDTO request = new UserCreateRequestDTO("한서", "hans");
-        given(userRepository.existsByNickname("hans")).willReturn(false);
 
-        User savedUser = User.builder()
-                .id(1L)
-                .name("한서")
-                .nickname("hans")
-                .build();
-
-        given(userRepository.save(any(User.class))).willReturn(savedUser);
-
-        // when
         UserResponseDTO response = userService.createUser(request);
 
-        // then
         assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.getId()).isNotNull();
         assertThat(response.getName()).isEqualTo("한서");
         assertThat(response.getNickname()).isEqualTo("hans");
 
-        verify(userRepository, times(1)).existsByNickname("hans");
-        verify(userRepository, times(1)).save(any(User.class));
+        // 실제 DB에 저장됐는지 확인
+        assertThat(userRepository.existsByNickname("hans")).isTrue();
     }
 
     @Test
     @DisplayName("❌ 닉네임이 중복되면 예외를 던진다")
     void createUser_Fail_DuplicateNickname() {
-        // given
-        UserCreateRequestDTO request = new UserCreateRequestDTO("한서", "hans");
-        given(userRepository.existsByNickname("hans")).willReturn(true);
+        // 미리 DB에 저장
+        userService.createUser(new UserCreateRequestDTO("한서", "hans"));
 
-        // when & then
-        assertThatThrownBy(() -> userService.createUser(request))
+        // 동일 닉네임으로 생성 시도
+        UserCreateRequestDTO duplicate = new UserCreateRequestDTO("한서2", "hans");
+
+        assertThatThrownBy(() -> userService.createUser(duplicate))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("이미 사용 중인 닉네임입니다.");
-
-        verify(userRepository, times(1)).existsByNickname("hans");
-        verify(userRepository, never()).save(any(User.class));
     }
 }

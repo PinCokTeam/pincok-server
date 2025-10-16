@@ -1,4 +1,4 @@
-package com.pincock.pincock.content;
+package com.pincock.pincock.content.controller;
 
 import com.pincock.pincock.controller.ContentController;
 import com.pincock.pincock.dto.content.ContentResponseDTO;

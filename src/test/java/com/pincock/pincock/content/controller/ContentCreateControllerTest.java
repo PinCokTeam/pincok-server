@@ -1,4 +1,4 @@
-package com.pincock.pincock.content;
+package com.pincock.pincock.content.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pincock.pincock.dto.content.ContentCreateRequestDTO;
