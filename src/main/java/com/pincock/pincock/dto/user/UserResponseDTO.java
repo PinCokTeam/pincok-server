@@ -1,4 +1,4 @@
-package com.pincock.pincock.dto;
+package com.pincock.pincock.dto.user;
 
 import com.pincock.pincock.entity.User;
 import lombok.*;
