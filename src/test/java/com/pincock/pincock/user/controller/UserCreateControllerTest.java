@@ -1,8 +1,8 @@
 package com.pincock.pincock.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pincock.pincock.dto.UserCreateRequestDTO;
-import com.pincock.pincock.dto.UserResponseDTO;
+import com.pincock.pincock.dto.user.UserCreateRequestDTO;
+import com.pincock.pincock.dto.user.UserResponseDTO;
 import com.pincock.pincock.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

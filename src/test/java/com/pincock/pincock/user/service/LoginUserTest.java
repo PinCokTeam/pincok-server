@@ -1,7 +1,7 @@
 package com.pincock.pincock.user.service;
 
-import com.pincock.pincock.dto.UserLoginRequestDTO;
-import com.pincock.pincock.dto.UserResponseDTO;
+import com.pincock.pincock.dto.user.UserLoginRequestDTO;
+import com.pincock.pincock.dto.user.UserResponseDTO;
 import com.pincock.pincock.entity.User;
 import com.pincock.pincock.repository.UserRepository;
 import com.pincock.pincock.service.UserService;

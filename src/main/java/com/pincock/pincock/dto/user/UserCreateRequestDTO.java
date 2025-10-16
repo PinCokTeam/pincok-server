@@ -1,4 +1,4 @@
-package com.pincock.pincock.dto;
+package com.pincock.pincock.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

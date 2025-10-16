@@ -1,8 +1,8 @@
 package com.pincock.pincock.controller;
 
-import com.pincock.pincock.dto.UserCreateRequestDTO;
-import com.pincock.pincock.dto.UserLoginRequestDTO;
-import com.pincock.pincock.dto.UserResponseDTO;
+import com.pincock.pincock.dto.user.UserCreateRequestDTO;
+import com.pincock.pincock.dto.user.UserLoginRequestDTO;
+import com.pincock.pincock.dto.user.UserResponseDTO;
 import com.pincock.pincock.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
