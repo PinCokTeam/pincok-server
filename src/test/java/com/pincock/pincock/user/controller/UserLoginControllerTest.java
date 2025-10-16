@@ -1,4 +1,4 @@
-package com.pincock.pincock.user;
+package com.pincock.pincock.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pincock.pincock.dto.UserLoginRequestDTO;
