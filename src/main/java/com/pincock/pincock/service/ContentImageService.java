@@ -22,13 +22,10 @@ public class ContentImageService {
     private final ContentImageRepository contentImageRepository;
 
     public List<ContentImageResponseDTO> getImage(Long contentId) {
-        Content content = contentRepository.findById(contentId)
-                .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다."));
-
-        return content.getImages().stream()
+        List<Content_Image> images = contentImageRepository.findByContentId(contentId);
+        return images.stream()
                 .map(ContentImageResponseDTO::fromEntity)
                 .collect(Collectors.toList());
-
     }
 
     @Transactional
