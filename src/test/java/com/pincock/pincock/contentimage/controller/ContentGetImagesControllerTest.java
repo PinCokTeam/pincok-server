@@ -1,7 +1,6 @@
-package com.pincock.pincock.contentimage;
+package com.pincock.pincock.contentimage.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pincock.pincock.dto.content.ContentResponseDTO;
 import com.pincock.pincock.dto.image.ContentImageResponseDTO;
 import com.pincock.pincock.dto.user.UserResponseDTO;
 import com.pincock.pincock.entity.ImageStatus;

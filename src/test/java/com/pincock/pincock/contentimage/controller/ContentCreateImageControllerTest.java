@@ -1,7 +1,6 @@
-package com.pincock.pincock.contentimage;
+package com.pincock.pincock.contentimage.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pincock.pincock.dto.content.ContentCreateRequestDTO;
 import com.pincock.pincock.dto.image.ContentImageRequestDTO;
 import com.pincock.pincock.dto.image.ContentImageResponseDTO;
 import com.pincock.pincock.dto.user.UserResponseDTO;
@@ -21,7 +20,6 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
