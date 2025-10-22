@@ -37,5 +37,6 @@ public class Content {
     private User user;
 
     @OneToMany(mappedBy = "content", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Content_Image> images = new ArrayList<>();
 }
