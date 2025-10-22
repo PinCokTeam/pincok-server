@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -38,21 +40,40 @@ public class ContentDetailTest {
         userRepository.save(user);
 
         // 2) 컨텐츠 저장
-        Content content = Content.builder()
-                .title("커피 맛집")
-                .detail("가격 저렴하고 맛좋은 커피 맛집")
-                .longitude(123456D)
-                .latitude(654321D)
-                .user(user)
-                .build();
-        contentRepository.save(content);
+//        long expectedId = 2L;
+        List<Content> contents = List.of(
+                Content.builder()
+                        .title("커피 맛집")
+                        .detail("가격 저렴하고 맛좋은 커피 맛집")
+                        .longitude(213141D)
+                        .latitude(23141515D)
+                        .user(user)
+                        .build(),
+                Content.builder()
+                        .title("베이커리 맛집")
+                        .detail("갓 구운 빵과 커피")
+                        .longitude(123456D)
+                        .latitude(654321D)
+                        .user(user)
+                        .build(),
+                Content.builder()
+                        .title("초밥 맛집")
+                        .detail("신선한 초밥과 사시미")
+                        .longitude(987654D)
+                        .latitude(456789D)
+                        .user(user)
+                        .build()
+        );
+        contentRepository.saveAll(contents);
+        Content expectedContent= contents.getLast();
 
         // 3) 서비스 호출
-        ContentResponseDTO responseDTO = contentService.contentDetail(user.getId(), content.getId());
+        ContentResponseDTO responseDTO = contentService.contentDetail(expectedContent.getId(), user.getId());
 
         // 4) 검증
         assertThat(responseDTO).isNotNull();
-        assertThat(responseDTO.getTitle()).isEqualTo("커피 맛집");
-        assertThat(responseDTO.getDetail()).isEqualTo("가격 저렴하고 맛좋은 커피 맛집");
+        assertThat(responseDTO.getId()).isEqualTo(expectedContent.getId());
+        assertThat(responseDTO.getTitle()).isEqualTo(expectedContent.getTitle());
+        assertThat(responseDTO.getDetail()).isEqualTo(expectedContent.getDetail());
     }
 }
