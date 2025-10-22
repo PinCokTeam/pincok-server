@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ContentRepository extends JpaRepository<Content, Long> {
     List<Content> findAllByUserId(Long userId);
+
+    List<Content> findAllByUserIdIn(List<Long> userIds);
 }
