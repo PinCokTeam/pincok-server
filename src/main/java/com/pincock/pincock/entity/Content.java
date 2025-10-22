@@ -9,7 +9,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name="content")
+@Table(name="contents")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,6 +32,11 @@ public class Content {
     @Column(nullable = false)
     private Double longitude;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @OneToMany(mappedBy = "content", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Content_Image> images = new ArrayList<>();
 }
