@@ -4,6 +4,7 @@ import com.pincock.pincock.entity.User;
 import lombok.*;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -12,6 +13,7 @@ public class UserResponseDTO {
     private Long id;
     private String name;
     private String nickname;
+    private String token;
 
     public static UserResponseDTO fromEntity(User user) {
         return UserResponseDTO.builder()

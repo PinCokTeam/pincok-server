@@ -8,6 +8,5 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class UserLoginRequestDTO {
-    private Long id;
     private String nickname;
 }
