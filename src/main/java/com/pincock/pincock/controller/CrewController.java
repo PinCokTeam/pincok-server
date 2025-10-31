@@ -5,6 +5,7 @@ import com.pincock.pincock.dto.crew.*;
 import com.pincock.pincock.dto.user.UserResponseDTO;
 import com.pincock.pincock.entity.Crew;
 import com.pincock.pincock.entity.User;
+import com.pincock.pincock.repository.UserRepository;
 import com.pincock.pincock.service.CrewService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +23,7 @@ import java.util.List;
 public class CrewController {
 
     private final CrewService crewService;
-
+    private final UserRepository userRepository;
     // 생성되어 있는 크루 리스트
     @GetMapping("/crews")
     public ResponseEntity<List<CrewResponseDTO>> getCrews() {
@@ -31,10 +33,12 @@ public class CrewController {
 
     // 내가 속한 크루 리스트
     @GetMapping("/users/me/crews")
-    public ResponseEntity<List<CrewResponseDTO>> getUserCrews(@AuthenticationPrincipal User user) {
-        if (user == null) {
+    public ResponseEntity<List<CrewResponseDTO>> getUserCrews(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+        User user = userRepository.findByNickname(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
 
         Long userId = user.getId();
         List<CrewResponseDTO> crewResponseDTOS = crewService.getUserCrewList(userId);
@@ -53,11 +57,12 @@ public class CrewController {
     @PostMapping("/crews")
     public ResponseEntity<CrewCreateResponseDTO> createCrew(
             @RequestBody CrewRequestDTO crewRequestDTO,
-            @AuthenticationPrincipal User user) {
-
-        if (user == null) {
+            @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+        User user = userRepository.findByNickname(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
 
         Long userId = user.getId();
 
@@ -69,11 +74,12 @@ public class CrewController {
     @PostMapping("/crews/{crew_id}/join")
     public ResponseEntity<Void> joinCrew(
             @PathVariable Long crew_id,
-            @AuthenticationPrincipal User user) {
-
-        if (user == null) {
+            @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+        User user = userRepository.findByNickname(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
 
         Long userId = user.getId();
         crewService.joinCrew(crew_id, userId);
@@ -85,11 +91,12 @@ public class CrewController {
     public ResponseEntity<CrewUpdateResponseDTO> updateCrew(
             @PathVariable Long crew_id,
             @RequestBody CrewUpdateRequestDTO crewUpdateRequestDTO,
-            @AuthenticationPrincipal User user) {
-
-        if (user == null) {
+            @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+        User user = userRepository.findByNickname(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
 
         Long userId = user.getId();
         CrewUpdateResponseDTO crewUpdateResponseDTO = crewService.updateCrew(crew_id, userId, crewUpdateRequestDTO);
@@ -99,10 +106,12 @@ public class CrewController {
     // 크루 삭제
     @DeleteMapping("/crews/{crew_id}")
     public ResponseEntity<Void> deleteCrew(@PathVariable Long crew_id,
-                                           @AuthenticationPrincipal User user) {
-        if (user == null) {
+                                           @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+        User user = userRepository.findByNickname(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
 
         Long userId = user.getId();
         crewService.deleteCrew(crew_id, userId);
@@ -112,10 +121,12 @@ public class CrewController {
     // 크루 탈퇴
     @DeleteMapping("/users/me/crews/{crew_id}")
     public ResponseEntity<Void> leaveCrew(@PathVariable Long crew_id,
-                                          @AuthenticationPrincipal User user) {
-        if (user == null) {
+                                          @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+        User user = userRepository.findByNickname(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
 
         Long userId = user.getId();
         crewService.leaveCrew(crew_id, userId);
@@ -126,11 +137,13 @@ public class CrewController {
     @GetMapping("/crews/{crew_id}/contents")
     public ResponseEntity<List<ContentResponseDTO>> getCrewContents(
             @PathVariable Long crew_id,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        if (user == null) {
+        if (userDetails == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+        User user = userRepository.findByNickname(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
 
         Long userId = user.getId();
         List<ContentResponseDTO> contentResponseDTOS = crewService.getCrewContents(crew_id, userId);
@@ -142,11 +155,13 @@ public class CrewController {
     public ResponseEntity<ContentResponseDTO> getCrewContent(
             @PathVariable Long crew_id,
             @PathVariable Long content_id,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        if (user == null) {
+        if (userDetails == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+        User user = userRepository.findByNickname(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
 
         Long userId = user.getId();
         ContentResponseDTO contentResponseDTO = crewService.getCrewContent(crew_id, content_id, userId);

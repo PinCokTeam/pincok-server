@@ -5,12 +5,14 @@ import com.pincock.pincock.dto.content.ContentResponseDTO;
 import com.pincock.pincock.dto.content.ContentUpdateRequestDTO;
 import com.pincock.pincock.dto.user.UserResponseDTO;
 import com.pincock.pincock.entity.User;
+import com.pincock.pincock.repository.UserRepository;
 import com.pincock.pincock.service.ContentService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,16 +22,20 @@ import java.util.List;
 public class ContentController {
 
     private final ContentService contentService;
+    private final UserRepository userRepository;
 
     // 내가 쓴 게시글 상세 조회
     @GetMapping("/contents/{content_id}")
     public ResponseEntity<ContentResponseDTO> getContent(
             @PathVariable Long content_id,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        if (user == null) {
+        if (userDetails == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+
+        User user = userRepository.findByNickname(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
 
         Long userId = user.getId();
         ContentResponseDTO contentResponseDTO = contentService.contentDetail(content_id, userId);
@@ -40,11 +46,13 @@ public class ContentController {
     // 내가 쓴 게시글 전체 조회
     @GetMapping("/contents")
     public ResponseEntity<List<ContentResponseDTO>> getContents(
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        if (user == null) {
+        if (userDetails == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+        User user = userRepository.findByNickname(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
 
         Long userId = user.getId();
 
@@ -56,11 +64,14 @@ public class ContentController {
     @PostMapping("/contents")
     public ResponseEntity<ContentResponseDTO> createContent(
             @RequestBody ContentCreateRequestDTO contentCreateRequestDTO,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        if (user == null) {
+        if (userDetails == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+
+        User user = userRepository.findByNickname(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
 
         Long userId = user.getId();
         ContentResponseDTO contentResponseDTO = contentService.addContent(contentCreateRequestDTO, userId);
@@ -73,11 +84,13 @@ public class ContentController {
     public ResponseEntity<ContentResponseDTO> changeContent(
             @PathVariable Long content_id,
             @RequestBody ContentUpdateRequestDTO updateRequestDTO,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        if (user == null) {
+        if (userDetails == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+        User user = userRepository.findByNickname(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
 
         Long userId = user.getId();
         ContentResponseDTO contentResponseDTO = contentService.updateContent(updateRequestDTO, content_id, userId);
@@ -89,11 +102,14 @@ public class ContentController {
     @DeleteMapping("/contents/{content_id}")
     public ResponseEntity<?> deleteContent(
             @PathVariable Long content_id,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        if (user == null) {
+        if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
+
+        User user = userRepository.findByNickname(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
 
         try {
             contentService.deleteContent(content_id, user.getId());

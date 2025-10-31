@@ -33,8 +33,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/signup").permitAll()
+                        .requestMatchers("/users/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/crews", "/crews/*").permitAll() // GET 요청만 공개
+                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userRepository),
