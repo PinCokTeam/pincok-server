@@ -17,11 +17,12 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CrewLeaveController {
+public class CrewDeleteControllerTest {
 
     @MockBean
     private CrewService crewService;
@@ -33,7 +34,7 @@ public class CrewLeaveController {
     private MockMvc mockMvc;
 
     @Test
-    void leaveCrew() throws Exception {
+    void DeleteCrew() throws Exception {
 
         User user = User.builder()
                 .id(1L)
@@ -43,9 +44,9 @@ public class CrewLeaveController {
 
         when(userRepository.findByNickname("seop"))
                 .thenReturn(Optional.of(user));
-        doNothing().when(crewService).leaveCrew(anyLong(), anyLong());
+        doNothing().when(crewService).deleteCrew(anyLong(), anyLong());
 
-        mockMvc.perform(delete("/users/me/crews/{crew_id}", 1L)
+        mockMvc.perform(delete("/crews/{crew_id}", 1L)
                         .with(SecurityMockMvcRequestPostProcessors.user("seop")))
                 .andExpect(status().isNoContent());
     }

@@ -1,6 +1,5 @@
 package com.pincock.pincock.crew.controller;
 
-import com.pincock.pincock.entity.Crew;
 import com.pincock.pincock.entity.User;
 import com.pincock.pincock.repository.CrewRepository;
 import com.pincock.pincock.repository.UserRepository;
@@ -23,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CrewJoinController {
+public class CrewJoinControllerTest {
 
     @MockBean
     private CrewService crewService;

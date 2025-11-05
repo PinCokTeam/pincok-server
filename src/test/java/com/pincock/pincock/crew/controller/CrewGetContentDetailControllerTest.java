@@ -1,9 +1,9 @@
 package com.pincock.pincock.crew.controller;
 
-import com.pincock.pincock.dto.crew.CrewResponseDTO;
+import com.pincock.pincock.dto.content.ContentResponseDTO;
+import com.pincock.pincock.entity.Content;
 import com.pincock.pincock.entity.Crew;
 import com.pincock.pincock.entity.User;
-import com.pincock.pincock.repository.CrewRepository;
 import com.pincock.pincock.repository.UserRepository;
 import com.pincock.pincock.service.CrewService;
 import org.junit.jupiter.api.Test;
@@ -24,37 +24,61 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CrewGetDetailController {
+public class CrewGetContentDetailControllerTest {
 
     @MockBean
     private CrewService crewService;
 
+    @MockBean
+    private UserRepository userRepository;
+
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private CrewRepository crewRepository;
-
     @Test
-    void getDetail() throws Exception {
-        CrewResponseDTO mockCrew = CrewResponseDTO.builder()
+    void getContentDetail() throws Exception {
+        User user = User.builder()
                 .id(1L)
-                .name("코린이")
-                .detail("어서오고")
-                .imageUrl("sadljnlqwe")
+                .name("seop")
+                .nickname("seop")
                 .build();
 
-        when(crewService.getCrew(1L)).thenReturn(mockCrew);
+        Crew crew = Crew.builder()
+                .id(1L)
+                .name("코린이")
+                .detail("환영")
+                .imageUrl("sadas")
+                .build();
 
-        mockMvc.perform(get("/crews/{crew_id}", 1L)
+        Content content = Content.builder()
+                .id(1L)
+                .title("맛집")
+                .detail("공유")
+                .latitude(123214D)
+                .longitude(123132D)
+                .build();
+
+        ContentResponseDTO contentResponseDTO = ContentResponseDTO.builder()
+                .id(1L)
+                .title("맛집")
+                .detail("공유")
+                .latitude(123214D)
+                .longitude(123132D)
+                .build();
+
+        when(userRepository.findByNickname("seop")).thenReturn(Optional.of(user));
+        when(crewService.getCrewContent(crew.getId(), content.getId(), user.getId()))
+                .thenReturn(contentResponseDTO);
+
+        mockMvc.perform(get("/crews/{crew_id}/contents/{content_id}", crew.getId(), content.getId())
                 .with(SecurityMockMvcRequestPostProcessors.user(
                         new org.springframework.security.core.userdetails.User(
                                 "seop", "", new ArrayList<>()
                         )
                 )))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("코린이"))
-                .andExpect(jsonPath("$.detail").value("어서오고"))
-                .andExpect(jsonPath("$.imageUrl").value("sadljnlqwe"));
+                .andExpect(jsonPath("$.length()").value(5))
+                .andExpect(jsonPath("$.title").value("맛집"))
+                .andExpect(jsonPath("$.detail").value("공유"));
     }
 }
