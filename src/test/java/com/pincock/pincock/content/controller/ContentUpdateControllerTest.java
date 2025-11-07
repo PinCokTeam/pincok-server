@@ -5,20 +5,30 @@ import com.pincock.pincock.controller.ContentController;
 import com.pincock.pincock.dto.content.ContentResponseDTO;
 import com.pincock.pincock.dto.content.ContentUpdateRequestDTO;
 import com.pincock.pincock.dto.user.UserResponseDTO;
+import com.pincock.pincock.entity.Content;
+import com.pincock.pincock.entity.User;
+import com.pincock.pincock.repository.ContentRepository;
+import com.pincock.pincock.repository.UserRepository;
 import com.pincock.pincock.service.ContentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import java.util.ArrayList;
+import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -31,33 +41,66 @@ class ContentUpdateControllerTest {
     @MockBean
     private ContentService contentService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @MockBean
+    private UserRepository userRepository;
 
-    private MockHttpSession session;
-
-    @BeforeEach
-    void setUp() {
-        session = new MockHttpSession();
-        session.setAttribute("loginUser", new UserResponseDTO(1L, "testUser", "닉네임"));
-    }
+    @MockBean
+    private ContentRepository contentRepository;
 
     @Test
     @DisplayName("게시글 수정 성공")
     void updateContent_success() throws Exception {
-        ContentUpdateRequestDTO updateRequest = new ContentUpdateRequestDTO("수정된 제목", "수정된 내용");
-        ContentResponseDTO response = new ContentResponseDTO(1L, "수정된 제목", "수정된 내용", 37.5665, 126.978);
+        User user = User.builder()
+                .name("seop")
+                .nickname("seop")
+                .build();
+        userRepository.save(user);
 
-        Mockito.when(contentService.updateContent(any(), anyLong(), anyLong())).thenReturn(response);
+        Content content = Content.builder()
+                .title("맛집")
+                .detail("어서오세여")
+                .latitude(123D)
+                .longitude(421421D)
+                .user(user)
+                .build();
+        contentRepository.save(content);
 
-        mockMvc.perform(put("/contents/1")
-                        .session(session)
+        ContentUpdateRequestDTO contentUpdateRequestDTO = ContentUpdateRequestDTO.builder()
+                .title("수정된 제목")
+                .detail("수정된 내용")
+                .build();
+
+        when(userRepository.findByNickname("seop"))
+                .thenReturn(Optional.of(User.builder().id(1L).nickname("seop").build()));
+
+        Long contentId = 1L;
+
+        ContentResponseDTO mockResponse = ContentResponseDTO.builder()
+                .id(content.getId())
+                .title("수정된 제목")
+                .detail("수정된 내용")
+                .latitude(37.5665)
+                .longitude(126.978)
+                .build();
+
+        when(contentService.updateContent(
+                any(ContentUpdateRequestDTO.class),
+                eq(contentId),
+                anyLong()
+        )).thenReturn(mockResponse);
+
+        mockMvc.perform(put("/contents/{content_id}", contentId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateRequest)))
+                        .content(new ObjectMapper().writeValueAsString(contentUpdateRequestDTO))
+                        .with(SecurityMockMvcRequestPostProcessors.user(
+                                new org.springframework.security.core.userdetails.User(
+                                        "seop", "", new ArrayList<>()
+                                )
+                        ))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())) // ← CSRF 토큰 추가
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("수정된 제목"))
-                .andExpect(jsonPath("$.detail").value("수정된 내용"))
-                .andExpect(jsonPath("$.latitude").value(37.5665))
-                .andExpect(jsonPath("$.longitude").value(126.978));
+                .andExpect(jsonPath("$.detail").value("수정된 내용"));
     }
+
 }

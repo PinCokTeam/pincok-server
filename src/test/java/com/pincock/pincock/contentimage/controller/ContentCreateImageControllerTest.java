@@ -14,13 +14,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -51,10 +54,6 @@ public class ContentCreateImageControllerTest {
                         .build()
         );
 
-        UserResponseDTO loginUser = new UserResponseDTO(1L, "한섭", "seop");
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("loginUser", loginUser);
-
         List<ContentImageResponseDTO> mockResponse = List.of(
                 ContentImageResponseDTO.builder()
                         .id(1L)
@@ -74,8 +73,13 @@ public class ContentCreateImageControllerTest {
                 anyList()
         )).thenReturn(mockResponse);
 
-        mockMvc.perform(post("/contents/{content_id}/images", 1L)
-                        .session(session)
+        Long contentId = 1L;
+        mockMvc.perform(post("/contents/{content_id}/images", contentId)
+                        .with(SecurityMockMvcRequestPostProcessors.user(
+                                new org.springframework.security.core.userdetails.User(
+                                        "seop", "", new ArrayList<>()
+                                )
+                        ))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(List.of(
                                 ContentImageRequestDTO.builder()

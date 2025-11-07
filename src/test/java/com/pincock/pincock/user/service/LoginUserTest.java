@@ -29,7 +29,7 @@ public class LoginUserTest {
 
     @Test
     void login_success() {
-        UserLoginRequestDTO userLoginRequestDTO = new UserLoginRequestDTO(1L,"hans");
+        UserLoginRequestDTO userLoginRequestDTO = new UserLoginRequestDTO("hans");
 
         User user = User.builder()
                 .id(1L)
@@ -37,19 +37,21 @@ public class LoginUserTest {
                 .nickname("hans")
                 .build();
 
-        given(userRepository.existsByNickname("hans")).willReturn(true);
-        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        // findByNickname을 Mocking
+        given(userRepository.findByNickname("hans")).willReturn(Optional.of(user));
+
         UserResponseDTO responseDTO = userService.loginUser(userLoginRequestDTO);
 
         assertThat(responseDTO).isNotNull();
         assertThat(responseDTO.getNickname()).isEqualTo("hans");
     }
 
+
     @Test
     void login_userNotFound() {
-        UserLoginRequestDTO userLoginRequestDTO = new UserLoginRequestDTO(1L,"hans");
+        UserLoginRequestDTO userLoginRequestDTO = new UserLoginRequestDTO("hans");
 
-        given(userRepository.existsByNickname("hans")).willReturn(false);
+        given(userRepository.findByNickname("hans")).willReturn(Optional.empty());
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
@@ -57,17 +59,20 @@ public class LoginUserTest {
         );
         assertThat(exception.getMessage()).isEqualTo("존재하지 않는 사용자입니다.");
     }
+
 
     @Test
     void login_nicknameNotFound() {
-        UserLoginRequestDTO userLoginRequestDTO = new UserLoginRequestDTO(1L,"hans");
+        UserLoginRequestDTO userLoginRequestDTO = new UserLoginRequestDTO("hans");
 
-        given(userRepository.existsByNickname("hans")).willReturn(false);
+        given(userRepository.findByNickname("hans")).willReturn(Optional.empty());
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> userService.loginUser(userLoginRequestDTO)
         );
+
         assertThat(exception.getMessage()).isEqualTo("존재하지 않는 사용자입니다.");
     }
+
 }

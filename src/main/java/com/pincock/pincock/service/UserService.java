@@ -38,13 +38,8 @@ public class UserService {
     }
 
     public UserResponseDTO loginUser(UserLoginRequestDTO userLoginRequestDTO) {
-        Long userId = userLoginRequestDTO.getId();
 
-        if (!userRepository.existsByNickname(userLoginRequestDTO.getNickname())) {
-            throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
-        }
-
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByNickname(userLoginRequestDTO.getNickname())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         return UserResponseDTO.fromEntity(user);

@@ -13,12 +13,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,17 +48,19 @@ public class ContentGetImagesControllerTest {
                 ImageStatus.NORMAL
         );
 
-        UserResponseDTO loginUser = new UserResponseDTO(1L, "한섭", "seop");
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("loginUser", loginUser);
-
         List<ContentImageResponseDTO> mockResponseList = List.of(mockResponse);
 
         Mockito.when(contentImageService.getImage(anyLong()))
                 .thenReturn(mockResponseList);
 
-        mockMvc.perform(get("/contents/{content_id}/images", 1L)
-                        .session(session)
+        Long contentId = 1L;
+
+        mockMvc.perform(get("/contents/{content_id}/images", contentId)
+                        .with(SecurityMockMvcRequestPostProcessors.user(
+                                new org.springframework.security.core.userdetails.User(
+                                        "seop", "", new ArrayList<>()
+                                )
+                        ))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
